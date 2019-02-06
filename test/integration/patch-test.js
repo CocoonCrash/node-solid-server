@@ -272,8 +272,9 @@ describe('PATCH', () => {
         patch: `<> solid:patches <https://tim.localhost:7777/read-write.ttl>;
                    solid:deletes { <x> <y> <z>. }.`
       }, { // expected:
-        status: 409,
-        text: 'The patch could not be applied'
+        status: 200,
+        text: 'Patch applied successfully',
+        result: '@prefix : </read-write.ttl#>.\n@prefix tim: </>.\n\ntim:a tim:b tim:c.\n\ntim:d tim:e tim:f.\n\n'
       }))
 
       describe('with a matching WHERE clause', describePatch({
@@ -307,8 +308,9 @@ describe('PATCH', () => {
                  solid:inserts { <x> <y> <z>. };
                  solid:deletes { <a> <b> <c>. }.`
     }, { // expected:
-      status: 409,
-      text: 'The patch could not be applied'
+      status: 200,
+      text: 'Patch applied successfully',
+      result: '@prefix : </new.ttl#>.\n@prefix tim: </>.\n\ntim:x tim:y tim:z.\n\n'
     }))
 
     describe('on a resource with read-only access', describePatch({
@@ -361,8 +363,9 @@ describe('PATCH', () => {
                    solid:inserts { <x> <y> <z>. };
                    solid:deletes { <x> <y> <z>. }.`
       }, { // expected:
-        status: 409,
-        text: 'The patch could not be applied'
+        status: 200,
+        text: 'Patch applied successfully',
+        result: '@prefix : </read-write.ttl#>.\n@prefix tim: </>.\n\ntim:a tim:b tim:c.\n\ntim:d tim:e tim:f.\n\ntim:x tim:y tim:z.\n\n'
       }))
 
       describe('with a patch for existing data', describePatch({
@@ -382,8 +385,9 @@ describe('PATCH', () => {
                    solid:inserts { <x> <y> <z>. };
                    solid:deletes { <q> <s> <s>. }.`
       }, { // expected:
-        status: 409,
-        text: 'The patch could not be applied'
+        status: 200,
+        text: 'Patch applied successfully',
+        result: '@prefix : </read-write.ttl#>.\n@prefix tim: </>.\n\ntim:a tim:b tim:c.\n\ntim:d tim:e tim:f.\n\ntim:x tim:y tim:z.\n\n'
       }))
 
       describe('with a matching WHERE clause', describePatch({
@@ -422,7 +426,7 @@ describe('PATCH', () => {
         before(() => backup(filename))
         after(() => restore(filename))
         // Store its contents to verify non-modification
-        if (!result) {
+        if (typeof result !== 'string') {
           originalContents = read(filename)
         }
       // Ensure a non-existing file is removed
